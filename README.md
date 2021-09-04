@@ -93,11 +93,11 @@ NAME     STATUS     ROLES                  AGE     VERSION
 master   NotReady   control-plane,master   8m41s   v1.22.1
 ```
 
-# 2. Worker node (GPU machine)
+# 2. Worker node1 (GPU machine) and Worker node2 (CPU macine)
 # 2-1. Disable Swapping and Blacklisting Nouveau driver
 Same as #1-1.
 
-# 2-2. Install Nvidia-driver
+# 2-2. Install Nvidia-driver (Only GPU machine)
 ```
 $ sudo apt-get update
 $ sudo apt-get install nvidia-driver-470
@@ -156,16 +156,18 @@ $ kubectl get nodes
 NAME      STATUS     ROLES                  AGE   VERSION
 master    NotReady   control-plane,master   23m   v1.22.1
 worker1   NotReady   <none>                 32s   v1.22.1
+worker2   NotReady   <none>                 20s   v1.22.1
 ```
 # 3-2. Label node at Master node
 ```
 $ kubectl label node worker1 node-role.kubernetes.io/node=worker1
 node/worker1 labeled
 
-$ kubectl get nodes
-NAME      STATUS     ROLES                  AGE     VERSION
-master    NotReady   control-plane,master   25m     v1.22.1
-worker1   NotReady   node                   2m32s   v1.22.1
+$ $ kubectl get nodes
+NAME      STATUS   ROLES                  AGE     VERSION
+master    Ready    control-plane,master   9h      v1.22.1
+worker1   Ready    node                   9h      v1.22.1
+worker2   Ready    node                   2m32s   v1.22.1
 ```
 
 # 3-3. Install contoller Pods at Master node 
@@ -189,7 +191,7 @@ k8s.gcr.io/coredns/coredns           v1.8.4    8d147537fb7d   3 months ago   47.
 k8s.gcr.io/pause                     3.5       ed210e3e4a5b   5 months ago   683kB
 ```
 
-Images in Worker1 node
+Images in Worker1 and Worker2 node
 ```
 worker1:~/Desktop$ sudo docker images
 REPOSITORY                   TAG       IMAGE ID       CREATED        SIZE
@@ -202,7 +204,7 @@ k8s.gcr.io/coredns/coredns   v1.8.4    8d147537fb7d   3 months ago   47.6MB
 k8s.gcr.io/pause             3.5       ed210e3e4a5b   5 months ago   683kB
 ```
 
-# 4. Worker node (GPU machine)
+# 4. Worker node1 (GPU machine)
 # 4-1. Install Helm chart at Worker1 node
 ```
 $ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
@@ -227,7 +229,102 @@ $ helm install --wait --generate-name \
 > nvidia/gpu-operator \
 > --set driver.enabled=false
 ```
-# 5-2. Run yaml file with GPU at Master node
+
+# 5-2. Run yaml file without GPU at Master node
+```
+$ cat ubuntu.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu 
+  labels:
+    name: ubuntu
+spec:
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    command:
+    - sleep
+    - "3600"
+ 
+$ kubectl apply -f ubuntu.yaml
+pod/ubuntu created
+
+$ kubectl get pods
+NAME                                                              READY   STATUS    RESTARTS      AGE
+gpu-operator-1630767025-node-feature-discovery-master-7f8bshkmt   1/1     Running   1 (8h ago)    8h
+gpu-operator-1630767025-node-feature-discovery-worker-2npzh       1/1     Running   1 (8h ago)    8h
+gpu-operator-1630767025-node-feature-discovery-worker-2z84j       1/1     Running   0             9m21s
+gpu-operator-1630767025-node-feature-discovery-worker-rjbf4       1/1     Running   2 (24m ago)   8h
+gpu-operator-74dcf6544d-7xg48                                     1/1     Running   1 (8h ago)    8h
+ubuntu                                                            1/1     Running   0             29s
+
+$ kubectl describe pod ubuntu
+Name:         ubuntu
+Namespace:    default
+Priority:     0
+Node:         worker2/192.168.122.77
+Start Time:   Sun, 05 Sep 2021 08:31:04 +0900
+Labels:       name=ubuntu
+Annotations:  cni.projectcalico.org/containerID: 0605982c33258e76647736a32a1f66b54811ab1fc5dcbbadda09f3dbcc0286a3
+              cni.projectcalico.org/podIP: 192.168.189.66/32
+              cni.projectcalico.org/podIPs: 192.168.189.66/32
+Status:       Running
+IP:           192.168.189.66
+IPs:
+  IP:  192.168.189.66
+Containers:
+  ubuntu:
+    Container ID:  docker://f4fe7eb6ac0faaad77eaa2d4c06b9945568ffe35c6e369401b6a4a0e87d6f07d
+    Image:         ubuntu
+    Image ID:      docker-pullable://ubuntu@sha256:9d6a8699fb5c9c39cf08a0871bd6219f0400981c570894cd8cbea30d3424a31f
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sleep
+      3600
+    State:          Running
+      Started:      Sun, 05 Sep 2021 08:31:20 +0900
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-mbtwg (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  kube-api-access-mbtwg:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  60s   default-scheduler  Successfully assigned default/ubuntu to worker2
+  Normal  Pulling    59s   kubelet            Pulling image "ubuntu"
+  Normal  Pulled     44s   kubelet            Successfully pulled image "ubuntu" in 14.789718728s
+  Normal  Created    44s   kubelet            Created container ubuntu
+  Normal  Started    44s   kubelet            Started container ubuntu
+
+
+$ kubectl exec -it ubuntu -- /bin/bash
+root@ubuntu:/# 
+root@ubuntu:/# nvidia-smi
+
+$ kubectl delete pod ubuntu
+```
+
+# 5-3. Run yaml file with GPU at Master node
 ```
 $ cat ubuntu-gpu.yaml 
 apiVersion: v1
