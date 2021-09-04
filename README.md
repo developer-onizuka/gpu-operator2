@@ -93,5 +93,48 @@ NAME     STATUS     ROLES                  AGE     VERSION
 master   NotReady   control-plane,master   8m41s   v1.22.1
 ```
 
+# 2. Worker node (GPU machine)
+# 2-1. Disable Swapping and Blacklisting Nouveau driver
+Same as #1-1.
 
+# 2-2. Install Curl
+```
+$ sudo apt-get install curl
+```
+# 2-3. Install Docker-CE
+```
+$ curl https://get.docker.com | sh \
+&& sudo systemctl --now enable docker
+```
+# 2-4. Configuring about using systemd instead of cgroups.
+```
+$ cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
 
+$ sudo systemctl enable docker
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
+```
+# 2-5. Install kubernetes and join cluster
+```
+$ sudo apt-get update \
+&& sudo apt-get install -y apt-transport-https curl
+
+$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+$ cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+$ sudo apt-get update \
+&& sudo apt-get install -y -q kubelet kubectl kubeadm \
+&& kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
+	--discovery-token-ca-cert-hash sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
