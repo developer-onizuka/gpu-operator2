@@ -86,6 +86,9 @@ $ mkdir -p $HOME/.kube \
 && sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 $ kubectl taint nodes --all node-role.kubernetes.io/master-
+$ kubectl get nodes
+NAME     STATUS     ROLES                  AGE     VERSION
+master   NotReady   control-plane,master   8m41s   v1.22.1
 ```
 
 
