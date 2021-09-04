@@ -123,7 +123,7 @@ $ sudo systemctl enable docker
 $ sudo systemctl daemon-reload
 $ sudo systemctl restart docker
 ```
-# 2-5. Install kubernetes and join cluster
+# 2-5. Install kubernetes
 ```
 $ sudo apt-get update \
 && sudo apt-get install -y apt-transport-https curl
@@ -134,7 +134,10 @@ deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 
 $ sudo apt-get update \
-&& sudo apt-get install -y -q kubelet kubectl kubeadm \
-&& kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
+&& sudo apt-get install -y -q kubelet kubectl kubeadm
+```
+# 2-6. Join cluster
+```
+$ kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
 	--discovery-token-ca-cert-hash sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
