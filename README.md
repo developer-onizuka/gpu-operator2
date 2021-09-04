@@ -1,6 +1,7 @@
 # GPU Operator with preinstalled driver in Host (the Case #3 below)
 
 -One master node (No GPU machine)
+
 -Two worker nodes (GPU machine and CPU machine)
 
 https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/getting-started.html#chart-customization-options
