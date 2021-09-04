@@ -75,6 +75,12 @@ $ sudo apt-get update \
 && sudo apt-get install -y -q kubelet kubectl kubeadm \
 && sudo kubeadm init --pod-network-cidr=192.168.0.0/16
 
+Copy the output below:
+********************************************************************************************************
+kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
+	--discovery-token-ca-cert-hash sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+********************************************************************************************************
+
 $ mkdir -p $HOME/.kube \
 && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config \
 && sudo chown $(id -u):$(id -g) $HOME/.kube/config
