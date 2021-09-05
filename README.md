@@ -3,6 +3,7 @@
 -One master node (No GPU machine)
 
 -Two worker nodes (GPU machine and CPU machine)
+https://youtu.be/NrjNibxd1rk
 
 |  | CPU | Memory | GPU |
 | --- | --- | --- | --- |
