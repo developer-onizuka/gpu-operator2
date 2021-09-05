@@ -204,19 +204,8 @@ k8s.gcr.io/coredns/coredns   v1.8.4    8d147537fb7d   3 months ago   47.6MB
 k8s.gcr.io/pause             3.5       ed210e3e4a5b   5 months ago   683kB
 ```
 
-# 4. Worker node1 (GPU machine)
-# 4-1. Install Helm chart at Worker1 node
-```
-$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
-&& chmod 700 get_helm.sh \
-&& ./get_helm.sh
-
-$ helm repo add nvidia https://nvidia.github.io/gpu-operator \
-&& helm repo update
-```
-
-# 5. Master node (no GPU machine)
-# 5-1. Install Helm chart at Master node
+# 4. Master node (no GPU machine)
+# 4-1. Install Helm chart at Master node
 ```
 $ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
 && chmod 700 get_helm.sh \
@@ -230,7 +219,7 @@ $ helm install --wait --generate-name \
 > --set driver.enabled=false
 ```
 
-# 5-2. Run yaml file without GPU at Master node
+# 4-2. Run yaml file without GPU at Master node
 ```
 $ cat ubuntu.yaml 
 apiVersion: v1
@@ -324,7 +313,7 @@ root@ubuntu:/# nvidia-smi
 $ kubectl delete pod ubuntu
 ```
 
-# 5-3. Run yaml file with GPU at Master node
+# 4-3. Run yaml file with GPU at Master node
 ```
 $ cat ubuntu-gpu.yaml 
 apiVersion: v1
