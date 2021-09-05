@@ -4,6 +4,12 @@
 
 -Two worker nodes (GPU machine and CPU machine)
 
+|  | CPU | Memory | GPU |
+| --- | --- | --- | --- |
+| Master | 2 | 8,192 | no |
+| Worker1 | 1 | 8,192 | 1 |
+| Worker2 | 2 | 8,192 | no |
+
 https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/getting-started.html#chart-customization-options
 
 | # | Scenario | Nvidia Driver | Nvidia Toolkit |
@@ -13,7 +19,7 @@ https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/getting-started.htm
 | #3 | GPU Operator (w/ driver.enabled=false) | In Host | DaemonSet |
 | #4 | GPU Operator (w/ toolkit.enabled=false) | DaemonSet | In Host |
 
-# 1. Master node (no GPU machine)
+# 1. Master node
 # 1-1. Disable Swapping and Blacklisting Nouveau driver
 ```
 $ uname -a
@@ -149,7 +155,7 @@ $ sudo kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
 	--discovery-token-ca-cert-hash sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 3. Master node (no GPU machine)
+# 3. Master node
 # 3-1. Comfirm the nodes in the cluster at Master node
 ```
 $ kubectl get nodes
@@ -162,12 +168,14 @@ worker2   NotReady   <none>                 20s   v1.22.1
 ```
 $ kubectl label node worker1 node-role.kubernetes.io/node=worker1
 node/worker1 labeled
+$ kubectl label node worker2 node-role.kubernetes.io/node=worker2
+node/worker2 labeled
 
-$ $ kubectl get nodes
-NAME      STATUS   ROLES                  AGE     VERSION
-master    Ready    control-plane,master   9h      v1.22.1
-worker1   Ready    node                   9h      v1.22.1
-worker2   Ready    node                   2m32s   v1.22.1
+$ kubectl get nodes
+NAME      STATUS     ROLES                  AGE     VERSION
+master    NotReady   control-plane,master   26m     v1.22.1
+worker1   NotReady   node                   9m6s    v1.22.1
+worker2   NotReady   node                   3m47s   v1.22.1
 ```
 
 # 3-3. Install contoller Pods at Master node 
@@ -194,17 +202,15 @@ k8s.gcr.io/pause                     3.5       ed210e3e4a5b   5 months ago   683
 Images in Worker1 and Worker2 node
 ```
 worker1:~/Desktop$ sudo docker images
-REPOSITORY                   TAG       IMAGE ID       CREATED        SIZE
-k8s.gcr.io/kube-proxy        v1.22.1   36c4ebbc9d97   2 weeks ago    104MB
-calico/node                  v3.20.0   5ef66b403f4f   5 weeks ago    170MB
-calico/pod2daemon-flexvol    v3.20.0   5991877ebc11   5 weeks ago    21.7MB
-calico/cni                   v3.20.0   4945b742b8e6   5 weeks ago    146MB
-calico/kube-controllers      v3.20.0   76ba70f4748f   5 weeks ago    63.2MB
-k8s.gcr.io/coredns/coredns   v1.8.4    8d147537fb7d   3 months ago   47.6MB
-k8s.gcr.io/pause             3.5       ed210e3e4a5b   5 months ago   683kB
+REPOSITORY                  TAG       IMAGE ID       CREATED        SIZE
+k8s.gcr.io/kube-proxy       v1.22.1   36c4ebbc9d97   2 weeks ago    104MB
+calico/node                 v3.20.0   5ef66b403f4f   5 weeks ago    170MB
+calico/pod2daemon-flexvol   v3.20.0   5991877ebc11   5 weeks ago    21.7MB
+calico/cni                  v3.20.0   4945b742b8e6   5 weeks ago    146MB
+k8s.gcr.io/pause            3.5       ed210e3e4a5b   5 months ago   683kB
 ```
 
-# 4. Master node (no GPU machine)
+# 4. Master node
 # 4-1. Install Helm chart at Master node
 ```
 $ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \
