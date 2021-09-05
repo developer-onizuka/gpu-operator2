@@ -215,8 +215,8 @@ $ helm repo add nvidia https://nvidia.github.io/gpu-operator \
 && helm repo update
 
 $ helm install --wait --generate-name \
-> nvidia/gpu-operator \
-> --set driver.enabled=false
+nvidia/gpu-operator \
+--set driver.enabled=false
 ```
 
 # 4-2. Run yaml file without GPU at Master node
