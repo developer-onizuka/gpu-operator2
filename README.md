@@ -6,11 +6,11 @@
 
 https://youtu.be/NrjNibxd1rk
 
-|  | CPU | Memory | GPU |
-| --- | --- | --- | --- |
-| Master | 2 | 8,192 MB | no |
-| Worker1 | 1 | 8,192 MB | 1 |
-| Worker2 | 2 | 8,192 MB | no |
+|  | CPU | Memory | GPU | GPU Driver |
+| --- | --- | --- | --- | --- |
+| Master | 2 | 8,192 MB | no | --- |
+| Worker1 | 1 | 8,192 MB | 1 | Installed |
+| Worker2 | 2 | 8,192 MB | no | --- |
 
 https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/getting-started.html#chart-customization-options
 
