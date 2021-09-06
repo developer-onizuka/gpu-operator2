@@ -151,6 +151,13 @@ $ sudo kubeadm join 192.168.122.147:6443 --token xxxxxxxxxxxxxxxxxxxxxxx \
 	--discovery-token-ca-cert-hash sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
+If you forget it or the token was expired, you can create it again as below:
+```
+$ kubeadm token create
+$ openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | \
+>    openssl dgst -sha256 -hex | sed 's/^.* //'
+```
+
 # 3. Master node
 # 3-1. Comfirm the nodes in the cluster at Master node
 ```
@@ -432,4 +439,15 @@ Sat Sep  4 15:03:16 2021
 |=============================================================================|
 +-----------------------------------------------------------------------------+
 
+```
+
+# 5. Uninstall GPU operator
+```
+$ helm delete $(helm ls -n default | awk '/gpu-operator/{print $1}') -n default
+```
+
+# 6. Delete worker nodes
+```
+$ kubectl delete node worker1
+$ kubectl delete node worker2
 ```
