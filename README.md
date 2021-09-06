@@ -1,8 +1,8 @@
 # GPU Operator with preinstalled driver in Host (the Case #2 below)
 
--One master node (No GPU machine)
+- One master node (No GPU machine)
 
--Two worker nodes (GPU machine and CPU machine)
+- Two worker nodes (GPU machine and CPU machine)
 
 https://youtu.be/NrjNibxd1rk
 
